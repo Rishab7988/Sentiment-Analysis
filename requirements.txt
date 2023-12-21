@@ -6,3 +6,4 @@ Pillow==8.4.0
 asyncio==3.4.3
 tensorflow
 sacremoses==0.0.53
+streamlit_webrtc
