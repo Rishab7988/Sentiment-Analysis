@@ -283,9 +283,7 @@ def main():
                         video_processor_factory=VideoTransformer)
     frame_placeholder=st.empty()    
     while True:
-        video_frame = webrtc_ctx.video_transformer.recv()
-        if video_frame is None:
-            break
+        video_frame = webrtc_ctx.video_transformer
             
         processed_frame = video_frame.to_ndarray(format="bgr24")
         detector = VideoTransformer()
