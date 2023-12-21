@@ -4,7 +4,8 @@ import tensorflow as tf
 from tensorflow import keras
 import streamlit as st
 from keras.preprocessing.image import img_to_array
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, VideoProcessorBase, WebRtcMode
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, WebRtcMode
+import av
 
 # OPENCV_LOG_LEVEL=0
 st.set_page_config(layout="wide")
@@ -29,8 +30,7 @@ class VideoTransformer(VideoProcessorBase):
         faces = faceCascade.detectMultiScale(
             image=img_gray, scaleFactor=1.3, minNeighbors=5)
         for (x, y, w, h) in faces:
-            cv2.rectangle(img=img, pt1=(x, y), pt2=(
-                x + w, y + h), color=(255, 0, 0), thickness=2)
+            cv2.rectangle(img=img, pt1=(x, y), pt2=(x + w, y + h), color=(255, 0, 0), thickness=2)
             roi_gray = img_gray[y:y + h, x:x + w]
             roi_gray = cv2.resize(roi_gray, (48, 48), interpolation=cv2.INTER_AREA)
             if np.sum([roi_gray]) != 0:
@@ -44,7 +44,8 @@ class VideoTransformer(VideoProcessorBase):
             label_position = (x, y)
             cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-        return img
+        # return img
+        return av.VideoFrame.from_ndarray(img, format="bgr24")
 
         # faces = faceCascade.detectMultiScale(
         #     image=img_gray, scaleFactor=1.3, minNeighbors=5)
