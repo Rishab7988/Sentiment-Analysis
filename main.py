@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import tensorflow as tf
 import streamlit as st
-import emoji
 
 # OPENCV_LOG_LEVEL=0
 st.set_page_config(layout="wide")
