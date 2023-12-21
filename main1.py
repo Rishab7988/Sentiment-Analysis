@@ -23,7 +23,7 @@ RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.goog
 
 class VideoTransformer(VideoProcessorBase):
     def transform(self, frame):
-        frame_placeholder=st.empty()
+        
         img = frame.to_ndarray(format="bgr24")
 
         #image gray
@@ -46,7 +46,7 @@ class VideoTransformer(VideoProcessorBase):
             cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         # return img
-        frame_placeholder.image(img, channels="BGR")
+        
         return av.VideoFrame.from_ndarray(img, format="bgr24")
 
         # faces = faceCascade.detectMultiScale(
@@ -279,14 +279,24 @@ class VideoTransformer(VideoProcessorBase):
 
 def main():
     st.write("Click Start")
-    video_frame = webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
+    webrtc_ctx=webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
                         video_processor_factory=VideoTransformer)
-    
+    frame_placeholder=st.empty()    
+    while True:
+        video_frame = webrtc_ctx.video_transformer.recv()
+        if video_frame is None:
+            break
+            
+        processed_frame = video_frame.to_ndarray(format="bgr24")
+        detector = VideoTransformer()
+        processed_frame = detector.transform(video_frame)
 
+        st.image(processed_frame, channels="BGR")
+        # time.sleep(1)  # Add a delay of 1 second between frame processing cycles
 
 if __name__ == "__main__":
     main()
-    
+
     
     
 
