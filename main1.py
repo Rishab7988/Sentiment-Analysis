@@ -66,9 +66,9 @@ class VideoTransformer(VideoTransformerBase):
             finalout = emotion_dict[maxindex]
             output = str(finalout)
         label_position = (x, y)
-        # cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-        x1,y1,w1,h1=0,0,175,75
-        cv2.putText(img , output,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
+        cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        # x1,y1,w1,h1=0,0,175,75
+        # cv2.putText(img , output,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
 
         return img
 
@@ -301,7 +301,7 @@ class VideoTransformer(VideoTransformerBase):
 
 
 def main():
-    
+    st.write("Click Start")
     webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
                         video_processor_factory=VideoTransformer)
 
