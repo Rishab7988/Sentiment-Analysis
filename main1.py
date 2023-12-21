@@ -31,11 +31,11 @@ class VideoTransformer(VideoTransformerBase):
 
         faces=faceCascade.detectMultiScale(gray,1.1,4)
     
-        for x,y,w,h in faces:
+        for (x,y,w,h) in faces:
+            cv2.rectangle(img, (x,y), (x+w, y+h), (255,0,0), 2)
             roi_gray=gray[y:y+h, x:x+w]
             roi_color=frame[y:y+h, x:x+w]
-            cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
-
+            
       
             facess=faceCascade.detectMultiScale(roi_gray)
             if(len(facess)==0):
@@ -44,29 +44,29 @@ class VideoTransformer(VideoTransformerBase):
                 for(ex,ey,ew,eh) in facess:
                     face_roi=roi_color[ey:ey+eh, ex:ex + ew]
 
-        final_image=cv2.resize(face_roi, (224,224)) # resizing the image to fit it in the model
-        final_image=np.expand_dims(final_image,axis=0) # need the fourth dimension
-        final_image=final_image/255.0 #normalizing the data
+            final_image=cv2.resize(face_roi, (224,224)) # resizing the image to fit it in the model
+            final_image=np.expand_dims(final_image,axis=0) # need the fourth dimension
+            final_image=final_image/255.0 #normalizing the data
     
 
 
 
-        font=cv2.FONT_HERSHEY_SIMPLEX
+            font=cv2.FONT_HERSHEY_SIMPLEX
 
-        predictions=load_model.predict(final_image)
+            predictions=load_model.predict(final_image)
 
-        font_scale=1.5
-        font=cv2.FONT_HERSHEY_PLAIN
+            font_scale=1.5
+            font=cv2.FONT_HERSHEY_PLAIN
 
-        if np.sum([roi_gray]) != 0:
-            roi = roi_gray.astype('float') / 255.0
-            roi = img_to_array(roi)
-            roi = np.expand_dims(roi, axis=0)
-            maxindex = int(np.argmax(predictions))
-            finalout = emotion_dict[maxindex]
-            output = str(finalout)
-        label_position = (x, y)
-        cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            if np.sum([roi_gray]) != 0:
+                roi = roi_gray.astype('float') / 255.0
+                roi = img_to_array(roi)
+                roi = np.expand_dims(roi, axis=0)
+                maxindex = int(np.argmax(predictions))
+                finalout = emotion_dict[maxindex]
+                output = str(finalout)
+            label_position = (x, y)
+            cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         # x1,y1,w1,h1=0,0,175,75
         # cv2.putText(img , output,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
 
