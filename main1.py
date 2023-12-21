@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow import keras
 import streamlit as st
 from keras.preprocessing.image import img_to_array
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration, VideoProcessorBase, WebRtcMode
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, VideoProcessorBase, WebRtcMode
 
 # OPENCV_LOG_LEVEL=0
 st.set_page_config(layout="wide")
@@ -20,7 +20,7 @@ emotion_dict = {0:'Angry', 1 :'Disgust', 3: 'Happy', 4:'Sad', 5: 'Neutral', 6:'S
 
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
-class VideoTransformer(VideoTransformerBase):
+class VideoTransformer(VideoProcessorBase):
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
 
