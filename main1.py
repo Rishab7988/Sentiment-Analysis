@@ -1,39 +1,31 @@
 import cv2
 import numpy as np
 import tensorflow as tf
-from tensorflow import keras
+from tensorflow.keras.preprocessing.image import img_to_array
 import streamlit as st
-from keras.preprocessing.image import img_to_array
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, WebRtcMode
-import av
 
-# OPENCV_LOG_LEVEL=0
 st.set_page_config(layout="wide")
 st.title("LIVE SENTIMENT ANALYSIS 😄 😡 😞 😲 🤢 😨 😐")
-load_model=tf.keras.models.load_model(r'final_model.h5')
+load_model = tf.keras.models.load_model('final_model.h5')
 
+faceCascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-faceCascade=cv2.CascadeClassifier(r'haarcascade_frontalface_default.xml')
-
-
-emotion_dict = {0:'Angry', 1 :'Disgust', 3: 'Happy', 4:'Sad', 5: 'Neutral', 6:'Surprised'}
-
+emotion_dict = {0: 'Angry', 1: 'Disgust', 2: 'Happy', 3: 'Sad', 4: 'Neutral', 5: 'Surprised'}
 
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
 class VideoTransformer(VideoProcessorBase):
     def transform(self, frame):
-        
         img = frame.to_ndarray(format="bgr24")
-
-        #image gray
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = faceCascade.detectMultiScale(
-            image=img_gray, scaleFactor=1.3, minNeighbors=5)
+        faces = faceCascade.detectMultiScale(image=img_gray, scaleFactor=1.3, minNeighbors=5)
+        
         for (x, y, w, h) in faces:
             cv2.rectangle(img=img, pt1=(x, y), pt2=(x + w, y + h), color=(255, 0, 0), thickness=2)
             roi_gray = img_gray[y:y + h, x:x + w]
             roi_gray = cv2.resize(roi_gray, (48, 48), interpolation=cv2.INTER_AREA)
+            
             if np.sum([roi_gray]) != 0:
                 roi = roi_gray.astype('float') / 255.0
                 roi = img_to_array(roi)
@@ -42,261 +34,28 @@ class VideoTransformer(VideoProcessorBase):
                 maxindex = int(np.argmax(prediction))
                 finalout = emotion_dict[maxindex]
                 output = str(finalout)
-            label_position = (x, y)
-            cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-        return img
+                label_position = (x, y)
+                cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
-        # return av.VideoFrame.from_ndarray(img, format="bgr24")
-
-        # faces = faceCascade.detectMultiScale(
-        #     image=img_gray, scaleFactor=1.3, minNeighbors=5)
-        # for (x, y, w, h) in faces:
-        #     cv2.rectangle(img=img, pt1=(x, y), pt2=(
-        #         x + w, y + h), color=(255, 0, 0), thickness=2)
-        #     roi_gray = img_gray[y:y + h, x:x + w]
-        #     roi_gray = cv2.resize(roi_gray, (48, 48), interpolation=cv2.INTER_AREA)
-        #     if np.sum([roi_gray]) != 0:
-        #         roi = roi_gray.astype('float') / 255.0
-        #         roi = img_to_array(roi)
-        #         roi = np.expand_dims(roi, axis=0)
-        #         prediction = classifier.predict(roi)[0]
-        #         maxindex = int(np.argmax(prediction))
-        #         finalout = emotion_dict[maxindex]
-        #         output = str(finalout)
-        #     label_position = (x, y)
-        #     cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-
-        # return img
-
-
-
-# webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
-
-# frame_placeholder=st.empty()
-# stop_button=st.button("STOP")
-
-# load_model=tf.keras.models.load_model(r'final_model.h5')
-
-
-
-# path=r'haarcascade_frontalface_default.xml'
-# font_scale=1.5
-# font=cv2.FONT_HERSHEY_PLAIN
-
-
-# #set rectangular background to white
-# rectangle_bgr=(225,225,225)
-#make a black image
-# img=np.zeros((500,500))
-
-# text="Some text in a box!"
-
-# (text_width,text_height)=cv2.getTextSize(text,font,fontScale=font_scale,thickness=1)[0]
-
-# text_offset_x=10
-# text_offset_y=img.shape[0]-25
-
-# #make the coords of the box with a small padding of two pixels
-# box_coords=((text_offset_x,text_offset_y),(text_offset_x + text_width + 2, text_offset_y - text_height -2))
-# cv2.rectangle(img,box_coords[0],box_coords[1],rectangle_bgr,cv2.FILLED)
-# cv2.putText(img,text,(text_offset_x,text_offset_y),font,fontScale=font_scale,color=(0,0,0),thickness=1)
-
-
-# cap=cv2.VideoCapture(0)
-
-# if not cap.isOpened():
-#     cap=cv2.VideoCapture(0)
-# if not cap.isOpened():
-#     raise IOError("Cannot open webcam")
-
-# while cap.isOpened() and not stop_button:
-#     ret,frame=cap.read()
-
-#     if not ret:
-#        st.write("Video capture has ended.")
-#        break
-    
-
-   #  frame_placeholder.image(frame,channels="BGR")
-    
-    
-    # gray=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-    
-
-    # face_roi=frame
-
-    # faces=faceCascade.detectMultiScale(gray,1.1,4)
-    
-    # for x,y,w,h in faces:
-    #   roi_gray=gray[y:y+h, x:x+w]
-    #   roi_color=frame[y:y+h, x:x+w]
-    #   cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
-
-      
-    #   facess=faceCascade.detectMultiScale(roi_gray)
-    #   if(len(facess)==0):
-    #      print("Face not detected")
-    #   else:
-    #      for(ex,ey,ew,eh) in facess:
-    #         face_roi=roi_color[ey:ey+eh, ex:ex + ew]
-
-    # final_image=cv2.resize(face_roi, (224,224)) # resizing the image to fit it in the model
-    # final_image=np.expand_dims(final_image,axis=0) # need the fourth dimension
-    # final_image=final_image/255.0 #normalizing the data
-    
-
-
-
-    # font=cv2.FONT_HERSHEY_SIMPLEX
-
-    # predictions=load_model.predict(final_image)
-
-    # font_scale=1.5
-    # font=cv2.FONT_HERSHEY_PLAIN
-
-
-    # if(np.argmax(predictions)==0):
-    #    status="Angry"
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))
-
-       
-
-
-    # elif(np.argmax(predictions)==1):
-    #    status="Disgust"
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))    
-
-       
-
-    # elif(np.argmax(predictions)==2):
-    #    status="Fear"
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))    
-
-       
-
-    # elif(np.argmax(predictions)==3):
-       
-       
-    #    status="Happy"
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))    
-
-       
-
-    # elif(np.argmax(predictions)==4):
-    #    status="Sad" 
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))    
-
-       
-
-    # elif(np.argmax(predictions)==5):
-    #    status="Neutral"
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))    
-
-       
-
-    # elif(np.argmax(predictions)==6):
-    #    status="Surprised"
-
-    #    x1,y1,w1,h1=0,0,175,75
-
-    #    frame=cv2.rectangle(frame, (x1,x1), (x1 + w1, y1 + h1), (0,0,0), -1)
-
-    #    frame=cv2.putText(frame,status,(x1 + int(w1/10), y1 + int(h1/2)), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255), 2)
-
-    #    frame=cv2.putText(frame,status,(100,150), font, 3, (0,0,255),2,cv2.LINE_4)
-
-    #    frame=cv2.rectangle(frame,(x1,y1), (x1+w1, y1+h1), (0,0,255))    
-
-       
-    # frame_placeholder.image(frame, channels="BGR")
-
-    # cv2.imshow('Face Emotion Recognition',frame)
-
-    # if cv2.waitKey(2) & 0xFF == ord('q'):
-    #    break
-
-# while True:
-    
-
-# cap.release()
-# cv2.destroyAllWindows()
-
+        return img
 
 def main():
     st.write("Click Start")
-    webrtc_ctx=webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
-                        video_processor_factory=VideoTransformer)
-    frame_placeholder=st.empty()    
-    while True:
-        video_frame = webrtc_ctx.video_transformer()
-            
-        processed_frame = video_frame.to_ndarray(format="bgr24")
-        detector = VideoTransformer()
-        processed_frame = detector.transform(video_frame)
+    webrtc_ctx = webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
+                                 video_processor_factory=VideoTransformer)
+    frame_placeholder = st.empty()
+    
+    if webrtc_ctx:
+        while True:
+            video_frame = webrtc_ctx.video_transformer.recv()
+            if video_frame is None:
+                break
 
-        frame_placeholder.image(processed_frame, channels="BGR")
-        # time.sleep(1)  # Add a delay of 1 second between frame processing cycles
+            processed_frame = video_frame.to_ndarray(format="bgr24")
+            detector = VideoTransformer()
+            processed_frame = detector.transform(video_frame)
+
+            frame_placeholder.image(processed_frame, channels="BGR")
 
 if __name__ == "__main__":
     main()
-
-    
-    
-
-
-
