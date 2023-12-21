@@ -23,6 +23,7 @@ RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.goog
 
 class VideoTransformer(VideoProcessorBase):
     def transform(self, frame):
+        frame_placeholder=st.empty()
         img = frame.to_ndarray(format="bgr24")
 
         #image gray
@@ -45,6 +46,7 @@ class VideoTransformer(VideoProcessorBase):
             cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
         # return img
+        frame_placeholder.image(img, channels="BGR")
         return av.VideoFrame.from_ndarray(img, format="bgr24")
 
         # faces = faceCascade.detectMultiScale(
@@ -279,8 +281,7 @@ def main():
     st.write("Click Start")
     video_frame = webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
                         video_processor_factory=VideoTransformer)
-    frame_placeholder=st.empty()
-    frame_placeholder.image(video_frame, channels="BGR")
+    
 
 
 if __name__ == "__main__":
