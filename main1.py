@@ -45,9 +45,9 @@ class VideoTransformer(VideoProcessorBase):
             label_position = (x, y)
             cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
 
-        # return img
+        return img
         
-        return av.VideoFrame.from_ndarray(img, format="bgr24")
+        # return av.VideoFrame.from_ndarray(img, format="bgr24")
 
         # faces = faceCascade.detectMultiScale(
         #     image=img_gray, scaleFactor=1.3, minNeighbors=5)
