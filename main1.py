@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras.preprocessing.image import img_to_array
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, WebRtcMode
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration, WebRtcMode
 
 st.set_page_config(layout="wide")
 st.title("LIVE SENTIMENT ANALYSIS 😄 😡 😞 😲 🤢 😨 😐")
@@ -15,7 +15,7 @@ emotion_dict = {0: 'Angry', 1: 'Disgust', 2: 'Happy', 3: 'Sad', 4: 'Neutral', 5:
 
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
-class VideoTransformer(VideoProcessorBase):
+class VideoTransformer(VideoTransformerBase):
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -42,18 +42,17 @@ class VideoTransformer(VideoProcessorBase):
 def main():
     st.write("Click Start")
     webrtc_ctx = webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
-                                 video_processor_factory=VideoTransformer)
+                                 video_transformer_factory=VideoTransformer)
     frame_placeholder = st.empty()
     
-    if webrtc_ctx and webrtc_ctx.video_transformer:
+    if webrtc_ctx.video_transformer:
         while True:
-            video_frame = webrtc_ctx.video_transformer.recv()
+            video_frame = webrtc_ctx.video_transformer.get_frame()
             if video_frame is None:
                 break
 
             processed_frame = video_frame.to_ndarray(format="bgr24")
-            detector = VideoTransformer()
-            processed_frame = detector.transform(video_frame)
+            processed_frame = VideoTransformer().transform(video_frame)
 
             frame_placeholder.image(processed_frame, channels="BGR")
 
