@@ -45,7 +45,7 @@ def main():
                                  video_processor_factory=VideoTransformer)
     frame_placeholder = st.empty()
     
-    if webrtc_ctx:
+    if webrtc_ctx and webrtc_ctx.video_transformer:
         while True:
             video_frame = webrtc_ctx.video_transformer.recv()
             if video_frame is None:
