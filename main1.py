@@ -16,7 +16,7 @@ emotion_dict = {0: 'Angry', 1: 'Disgust', 2: 'Happy', 3: 'Sad', 4: 'Neutral', 5:
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
 class VideoTransformer(VideoProcessorBase):
-    def recv(self, frame):
+    def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(image=img_gray, scaleFactor=1.3, minNeighbors=5)
@@ -24,7 +24,7 @@ class VideoTransformer(VideoProcessorBase):
         for (x, y, w, h) in faces:
             cv2.rectangle(img=img, pt1=(x, y), pt2=(x + w, y + h), color=(255, 0, 0), thickness=2)
             roi_gray = img_gray[y:y + h, x:x + w]
-            roi_gray = cv2.resize(roi_gray, (48, 48), interpolation=cv2.INTER_AREA)
+            roi_gray = cv2.resize(roi_gray, (224, 224), interpolation=cv2.INTER_AREA)
             
             if np.sum([roi_gray]) != 0:
                 roi = roi_gray.astype('float') / 255.0
@@ -47,12 +47,12 @@ def main():
     
     if webrtc_ctx and webrtc_ctx.video_processor:
         while True:
-            video_frame = webrtc_ctx.video_processor.recv()
+            video_frame = webrtc_ctx.video_processor.process_frame()
             if video_frame is None:
                 break
 
             processed_frame = video_frame.to_ndarray(format="bgr24")
-            processed_frame = webrtc_ctx.video_processor.recv(video_frame)
+            processed_frame = webrtc_ctx.video_processor.process_frame(video_frame)
 
             frame_placeholder.image(processed_frame, channels="BGR")
 
