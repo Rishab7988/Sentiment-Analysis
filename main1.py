@@ -277,9 +277,10 @@ class VideoTransformer(VideoProcessorBase):
 
 def main():
     st.write("Click Start")
-    webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
+    video_frame = webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
                         video_processor_factory=VideoTransformer)
-
+    frame_placeholder=st.empty()
+    frame_placeholder.image(video_frame, channels="BGR")
 
 
 if __name__ == "__main__":
