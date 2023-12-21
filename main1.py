@@ -307,7 +307,7 @@ class VideoTransformer(VideoTransformerBase):
 
 def main():
     st.write("Click Start")
-    webrtc_streamer(key="example", rtc_configuration=RTC_CONFIGURATION,
+    webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
                         video_processor_factory=VideoTransformer)
 
 
