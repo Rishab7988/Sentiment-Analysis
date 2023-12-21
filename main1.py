@@ -47,12 +47,12 @@ def main():
     
     if webrtc_ctx and webrtc_ctx.video_processor:
         while True:
-            video_frame = webrtc_ctx.video_processor.process_frame()
+            video_frame = webrtc_ctx.video_processor.recv()
             if video_frame is None:
                 break
 
             processed_frame = video_frame.to_ndarray(format="bgr24")
-            processed_frame = webrtc_ctx.video_processor.process_frame(video_frame)
+            processed_frame = webrtc_ctx.video_processor.transform(video_frame)
 
             frame_placeholder.image(processed_frame, channels="BGR")
 
