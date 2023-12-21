@@ -283,13 +283,13 @@ def main():
                         video_processor_factory=VideoTransformer)
     frame_placeholder=st.empty()    
     while True:
-        video_frame = webrtc_ctx.video_transformer
+        video_frame = webrtc_ctx.video_transformer()
             
         processed_frame = video_frame.to_ndarray(format="bgr24")
         detector = VideoTransformer()
         processed_frame = detector.transform(video_frame)
 
-        st.image(processed_frame, channels="BGR")
+        frame_placeholder.image(processed_frame, channels="BGR")
         # time.sleep(1)  # Add a delay of 1 second between frame processing cycles
 
 if __name__ == "__main__":
