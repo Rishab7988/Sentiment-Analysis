@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.preprocessing.image import img_to_array
 import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, WebRtcMode
+import av
 
 st.set_page_config(layout="wide")
 st.title("LIVE SENTIMENT ANALYSIS 😄 😡 😞 😲 🤢 😨 😐")
@@ -15,14 +16,14 @@ emotion_dict = {0: 'Angry', 1: 'Disgust', 2: 'Happy', 3: 'Sad', 4: 'Neutral', 5:
 
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
-class VideoTransformer(VideoProcessorBase):
-    def transform(self, frame):
+class VideoProcessor(VideoProcessorBase):
+    def recv(self, frame):
         img = frame.to_ndarray(format="bgr24")
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        faces = faceCascade.detectMultiScale(image=img_gray, scaleFactor=1.3, minNeighbors=5)
+        faces = faceCascade.detectMultiScale(image=img_gray, scaleFactor=1.1, minNeighbors=3)
         
         for (x, y, w, h) in faces:
-            cv2.rectangle(img=img, pt1=(x, y), pt2=(x + w, y + h), color=(255, 0, 0), thickness=2)
+            cv2.rectangle(img=img, pt1=(x, y), pt2=(x + w, y + h), color=(0, 255, 0), thickness=3)
             roi_gray = img_gray[y:y + h, x:x + w]
             roi_gray = cv2.resize(roi_gray, (224, 224), interpolation=cv2.INTER_AREA)
             
@@ -37,24 +38,11 @@ class VideoTransformer(VideoProcessorBase):
                 label_position = (x, y)
                 cv2.putText(img, output, label_position, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
         
-        return img
+        return av.VideoFrame.from_ndarray(img,format="bgr24")
 
 def main():
     st.write("Click Start")
-    webrtc_ctx = webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
-                                 video_processor_factory=VideoTransformer)
-    frame_placeholder = st.empty()
-    
-    if webrtc_ctx and webrtc_ctx.video_processor:
-        while True:
-            video_frame = webrtc_ctx.video_processor.recv()
-            if video_frame is None:
-                break
-
-            processed_frame = video_frame.to_ndarray(format="bgr24")
-            processed_frame = webrtc_ctx.video_processor.transform(video_frame)
-
-            frame_placeholder.image(processed_frame, channels="BGR")
+    webrtc_streamer(key="key", rtc_configuration=RTC_CONFIGURATION, video_processor_factory=VideoProcessor)
 
 if __name__ == "__main__":
     main()
