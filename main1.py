@@ -16,7 +16,7 @@ emotion_dict = {0: 'Angry', 1: 'Disgust', 2: 'Happy', 3: 'Sad', 4: 'Neutral', 5:
 RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
 class VideoTransformer(VideoProcessorBase):
-    def transform(self, frame):
+    def recv(self, frame):
         img = frame.to_ndarray(format="bgr24")
         img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = faceCascade.detectMultiScale(image=img_gray, scaleFactor=1.3, minNeighbors=5)
@@ -52,7 +52,7 @@ def main():
                 break
 
             processed_frame = video_frame.to_ndarray(format="bgr24")
-            processed_frame = VideoTransformer().transform(video_frame)
+            processed_frame = webrtc_ctx.video_processor.recv(video_frame)
 
             frame_placeholder.image(processed_frame, channels="BGR")
 
