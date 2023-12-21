@@ -1,9 +1,10 @@
 import cv2
 import numpy as np
 import tensorflow as tf
+from tensorflow import keras
 import streamlit as st
 from keras.preprocessing.image import img_to_array
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration, VideoProcessorBase, WebRtcMode
 
 # OPENCV_LOG_LEVEL=0
 st.set_page_config(layout="wide")
@@ -15,6 +16,9 @@ faceCascade=cv2.CascadeClassifier(r'haarcascade_frontalface_default.xml')
 
 
 emotion_dict = {0:'Angry', 1 :'Disgust', 3: 'Happy', 4:'Sad', 5: 'Neutral', 6:'Surprised'}
+
+
+RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
 
 class VideoTransformer(VideoTransformerBase):
     def transform(self, frame):
@@ -58,8 +62,7 @@ class VideoTransformer(VideoTransformerBase):
             roi = roi_gray.astype('float') / 255.0
             roi = img_to_array(roi)
             roi = np.expand_dims(roi, axis=0)
-            prediction = load_model.predict(roi)[0]
-            maxindex = int(np.argmax(prediction))
+            maxindex = int(np.argmax(predictions))
             finalout = emotion_dict[maxindex]
             output = str(finalout)
         label_position = (x, y)
@@ -299,7 +302,8 @@ class VideoTransformer(VideoTransformerBase):
 
 def main():
     
-    webrtc_streamer(key="example", video_transformer_factory=VideoTransformer)
+    webrtc_streamer(key="example", mode=WebRtcMode.SENDRECV, rtc_configuration=RTC_CONFIGURATION,
+                        video_processor_factory=VideoTransformer)
 
 
 
