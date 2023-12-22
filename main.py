@@ -5,7 +5,7 @@ import streamlit as st
 
 # OPENCV_LOG_LEVEL=0
 st.set_page_config(layout="wide")
-st.title("LIVE SENTIMENT ANALYSIS 😄 😡 😞 😲 🤢 😨 😐")
+st.title("LIVE SENTIMENT ANALYSIS 😄 😡 😞 😲 🤢 😨 😐 ...")
 
 frame_placeholder=st.empty()
 stop_button=st.button("STOP")
