@@ -1,7 +1,7 @@
 <h1> Live Sentiment-Analysis with deployment on stream-lit</h1>
 <br>
 
-<h2> This project utilizes live webcam input to perform real-time sentiment analysis. By leveraging computer vision and natural language processing techniques, it identifies and analyzes facial expressions to determine the emotional state of the person in front of the camera.</h2>
+<h2> This project utilizes live webcam input to perform real-time sentiment analysis. By leveraging computer vision and Image Classification techniques, it identifies and analyzes facial expressions to determine the emotional state of the person in front of the camera.</h2>
 <br>
 
 <h2> Objective </h2>
