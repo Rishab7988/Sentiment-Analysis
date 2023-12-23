@@ -23,6 +23,7 @@
 <h2> Working </h2>
 link: https://sentiment-analysis-mllj4zxrcri3pyvlv44a8p.streamlit.app/
 
-P.S. I know there is much scope of improvement in the CNN model. Hovwver, my main goal was to build an end-to-end project with deployment. For suggestions or contacts, linkedIn: https://www.linkedin.com/in/rishab-mahato/ 
+<br>
+For suggestions or contacts, linkedIn: https://www.linkedin.com/in/rishab-mahato/ 
  
 
